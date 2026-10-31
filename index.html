@@ -1,0 +1,546 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Hasti Tajik — data scientist. M.Sc. research on verifiable LLM retrieval, computer vision for poultry farms, and reimplementations of recent ML papers.">
+<meta property="og:title" content="Hasti Tajik — Data Scientist">
+<meta property="og:description" content="Hasti Tajik — data scientist. M.Sc. research on verifiable LLM retrieval, computer vision for poultry farms, and reimplementations of recent ML papers.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://hastitajik.github.io/">
+<title>Hasti Tajik — Data Scientist</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: a "replication record" — sticky identity column on the left, a scrolling ledger of
+   papers → code on the right. Each project carries its source paper like a citation stub. */
+:root {
+  --bg: #F2F4F6;
+  --surface: #FFFFFF;
+  --ink: #15202A;
+  --muted: #5A6874;
+  --rule: #D5DCE2;
+  --accent: #2648B8;
+  --accent-soft: #E3E9FB;
+  --cert: #B7791F;
+  --cert-soft: #F6EBD8;
+  --display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --body: "Source Serif 4", Georgia, "Times New Roman", serif;
+  --mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0F151B; --surface: #161E26; --ink: #E4EAF0; --muted: #98A6B3; --rule: #2A3540;
+    --accent: #8AA6FF; --accent-soft: #1D2A4D; --cert: #E2AC57; --cert-soft: #3A2D18;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0F151B; --surface: #161E26; --ink: #E4EAF0; --muted: #98A6B3; --rule: #2A3540;
+  --accent: #8AA6FF; --accent-soft: #1D2A4D; --cert: #E2AC57; --cert-soft: #3A2D18;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+body {
+  background: var(--bg); color: var(--ink);
+  font-family: var(--body); font-size: 17px; line-height: 1.6;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+a { color: var(--accent); text-underline-offset: 3px; text-decoration-thickness: 1px; }
+a:hover { text-decoration-thickness: 2px; }
+a:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 2px; }
+h1, h2, h3 { font-family: var(--display); text-wrap: balance; margin: 0; }
+
+.shell { max-width: 1180px; margin: 0 auto; display: grid; grid-template-columns: 300px minmax(0, 1fr); gap: 64px; padding-block: 56px 80px; }
+
+/* ---------- identity column ---------- */
+.id { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 40px); align-self: start; display: grid; gap: 28px; }
+.id h1 { font-size: 46px; line-height: .98; font-weight: 800; letter-spacing: -.02em; }
+.id .role { font-family: var(--mono); font-size: 12.5px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); line-height: 1.7; }
+.id nav { display: grid; gap: 2px; border-top: 1px solid var(--rule); padding-top: 18px; }
+.id nav a { font-family: var(--display); font-size: 15px; color: var(--ink); text-decoration: none; padding: 5px 0; display: flex; justify-content: space-between; }
+.id nav a span { font-family: var(--mono); font-size: 12px; color: var(--muted); }
+.id nav a:hover { color: var(--accent); }
+.links { display: grid; gap: 8px; font-family: var(--mono); font-size: 13px; }
+.links .row { display: flex; gap: 10px; align-items: baseline; min-width: 0; }
+.links .k { color: var(--muted); width: 64px; flex: none; }
+.links .v { min-width: 0; overflow-wrap: anywhere; }
+.copy { font: inherit; font-size: 11px; border: 1px solid var(--rule); background: transparent; color: var(--muted); border-radius: 4px; padding: 1px 6px; cursor: pointer; margin-left: 6px; }
+.copy:hover { color: var(--ink); border-color: var(--muted); }
+.copy:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* ---------- main ---------- */
+main { display: grid; grid-template-columns: minmax(0, 1fr); gap: 88px; min-width: 0; }
+section, .rec, .figure { min-width: 0; }
+.lede { display: grid; gap: 22px; }
+.lede p.big { color: var(--ink); font-family: var(--display); font-size: clamp(28px, 3.6vw, 40px); line-height: 1.15; font-weight: 600; letter-spacing: -.015em; margin: 0; max-width: 22ch; }
+.lede p.big em { font-style: normal; color: var(--accent); }
+.lede p { margin: 0; max-width: 62ch; color: var(--muted); }
+.tally { display: flex; flex-wrap: wrap; gap: 10px 28px; font-family: var(--mono); font-size: 13px; color: var(--muted); border-top: 1px solid var(--rule); padding-top: 16px; }
+.tally b { color: var(--ink); font-weight: 600; font-size: 15px; margin-right: 4px; }
+
+section > header { display: grid; gap: 6px; margin-bottom: 28px; }
+.eyebrow { font-family: var(--mono); font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: var(--accent); }
+section > header h2 { font-size: 30px; font-weight: 700; letter-spacing: -.01em; }
+section > header p { margin: 0; color: var(--muted); max-width: 62ch; }
+
+/* project record */
+.rec { display: grid; gap: 16px; padding-block: 30px; border-top: 1px solid var(--rule); }
+.rec:first-of-type { border-top: 0; padding-top: 0; }
+.rec-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 8px 20px; }
+.rec h3 { font-size: 23px; font-weight: 700; letter-spacing: -.01em; line-height: 1.2; }
+.repo { font-family: var(--mono); font-size: 13px; overflow-wrap: anywhere; min-width: 0; }
+.rec-head > * { min-width: 0; }
+.cite { font-family: var(--mono); font-size: 12.5px; color: var(--muted); border-left: 2px solid var(--rule); padding-left: 12px; line-height: 1.55; }
+.cite i { font-family: var(--body); font-size: 14px; color: var(--ink); }
+.rec p { margin: 0; max-width: 66ch; }
+.rec ul { margin: 0; padding-left: 20px; max-width: 66ch; display: grid; gap: 6px; }
+.stack { display: flex; flex-wrap: wrap; gap: 6px; }
+.stack span { font-family: var(--mono); font-size: 12px; padding: 2px 8px; border: 1px solid var(--rule); border-radius: 3px; color: var(--muted); }
+.note { font-size: 15px; color: var(--muted); font-style: italic; max-width: 66ch; }
+
+/* featured research figure */
+.figure { background: var(--surface); border: 1px solid var(--rule); border-radius: 6px; padding: 20px 22px; display: grid; gap: 14px; }
+.figure .cap { font-family: var(--mono); font-size: 12px; color: var(--muted); }
+.split { display: flex; height: 54px; border-radius: 4px; overflow: hidden; font-family: var(--mono); font-size: 12.5px; }
+.split > div { display: flex; flex-direction: column; justify-content: center; padding: 0 12px; min-width: 0; }
+.split .c { flex: 67; background: var(--cert-soft); color: var(--ink); border-right: 2px solid var(--surface); }
+.split .u { flex: 33; background: var(--accent-soft); color: var(--ink); }
+.split b { font-weight: 600; font-size: 15px; }
+.legend { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px 24px; font-size: 15px; }
+.legend div { display: grid; gap: 2px; }
+.legend .n { font-family: var(--display); font-size: 30px; font-weight: 700; line-height: 1; font-variant-numeric: tabular-nums; }
+.legend .n.cert { color: var(--cert); }
+.legend .t { color: var(--muted); font-size: 14px; }
+
+/* churn bars */
+.bars { display: grid; gap: 7px; font-family: var(--mono); font-size: 12.5px; }
+.bar { display: grid; grid-template-columns: 150px minmax(0, 1fr) 46px; gap: 12px; align-items: center; }
+.bar .track { height: 12px; background: var(--bg); border-radius: 2px; position: relative; }
+.bar .fill { position: absolute; inset: 0 auto 0 0; background: var(--rule); border-radius: 2px; }
+.bar.me .fill { background: var(--accent); }
+.bar.me { color: var(--ink); font-weight: 600; }
+.bar .val { text-align: right; font-variant-numeric: tabular-nums; }
+.axis { display: grid; grid-template-columns: 150px minmax(0, 1fr) 46px; gap: 12px; font-family: var(--mono); font-size: 11px; color: var(--muted); }
+.axis .ticks { display: flex; justify-content: space-between; }
+
+/* broiler signals */
+.signals { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 1px; background: var(--rule); border: 1px solid var(--rule); border-radius: 6px; overflow: hidden; }
+.signals div { background: var(--surface); padding: 14px 16px; display: grid; gap: 4px; align-content: start; }
+.signals b { font-family: var(--display); font-size: 16px; }
+.signals span { font-size: 14px; color: var(--muted); line-height: 1.45; }
+.signals code { font-family: var(--mono); font-size: 11.5px; color: var(--accent); }
+
+/* small items, skills, education */
+.pair { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 28px; }
+.pair .rec { border-top: 0; padding: 0; }
+.skills { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 12px 28px; }
+.skills dt { font-family: var(--mono); font-size: 12.5px; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; padding-top: 3px; }
+.skills dd { margin: 0; }
+.edu { display: grid; gap: 16px; }
+.edu div { display: grid; grid-template-columns: 130px minmax(0, 1fr); gap: 16px; }
+.edu .yr { font-family: var(--mono); font-size: 13px; color: var(--muted); padding-top: 3px; font-variant-numeric: tabular-nums; }
+.edu b { font-family: var(--display); font-weight: 600; }
+footer { font-family: var(--mono); font-size: 12px; color: var(--muted); border-top: 1px solid var(--rule); padding-top: 18px; }
+
+/* hero network */
+.hero { position: relative; display: grid; gap: 22px; margin-bottom: -56px; }
+@media (max-width: 900px) { .hero { margin-bottom: -36px; } }
+.net { width: 100%; height: 230px; display: block; border-radius: 8px; background: var(--surface); border: 1px solid var(--rule); }
+.net-cap { position: absolute; left: 16px; top: 14px; font-family: var(--mono); font-size: 11.5px; color: var(--muted); background: var(--surface); padding: 2px 6px; border-radius: 3px; pointer-events: none; }
+.net-cap b { color: var(--cert); font-weight: 600; }
+
+/* selected-work index */
+.index { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 12px; }
+.card { display: grid; grid-template-rows: auto auto 1fr auto; gap: 8px; padding: 16px 16px 14px; background: var(--surface); border: 1px solid var(--rule); border-radius: 8px; text-decoration: none; color: var(--ink); transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease; }
+.card:hover { transform: translateY(-3px); border-color: var(--accent); box-shadow: 0 10px 24px -16px var(--accent); text-decoration: none; }
+.card:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.card .tag { font-family: var(--mono); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); }
+.card b { font-family: var(--display); font-size: 17px; line-height: 1.25; font-weight: 600; }
+.card span.d { font-size: 14.5px; color: var(--muted); line-height: 1.45; }
+.card .fig { font-family: var(--mono); font-size: 12px; color: var(--ink); border-top: 1px dashed var(--rule); padding-top: 8px; }
+.card .fig em { font-style: normal; color: var(--cert); font-weight: 600; }
+.card.feature { grid-column: span 2; background: linear-gradient(135deg, var(--accent-soft), var(--surface) 70%); }
+@media (max-width: 560px) { .card.feature { grid-column: auto; } }
+@media (prefers-reduced-motion: reduce) { .card, .card:hover { transition: none; transform: none; } }
+
+/* project thumbnails */
+.thumb { width: 100%; max-width: 100%; height: auto; display: block; background: var(--surface); border: 1px solid var(--rule); border-radius: 8px; }
+.thumb .ln { stroke: var(--rule); stroke-width: 1.5; fill: none; }
+.thumb .ac { stroke: var(--accent); fill: none; stroke-width: 2; }
+.thumb .acf { fill: var(--accent); }
+.thumb .bx { fill: var(--accent-soft); stroke: var(--accent); stroke-width: 1.2; }
+.thumb .ct { fill: var(--cert); }
+.thumb .ctl { stroke: var(--cert); stroke-width: 2; fill: none; }
+.thumb .nd { fill: var(--muted); }
+.thumb text { fill: var(--muted); font-family: var(--mono); font-size: 11px; }
+.rec-body { display: grid; grid-template-columns: minmax(0, 1fr) 230px; gap: 24px; align-items: start; }
+.rec-body > div { display: grid; gap: 14px; min-width: 0; }
+@media (max-width: 700px) { .rec-body { grid-template-columns: minmax(0, 1fr); } .rec-body .thumb { max-width: 340px; } }
+
+/* active nav + mobile chip nav */
+.id nav a.on { color: var(--accent); }
+.id nav a.on span { color: var(--accent); }
+.chips { display: none; }
+@media (max-width: 900px) {
+  body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--bg); }
+  .chips { display: flex; gap: 8px; overflow-x: auto; position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--bg); padding-block: 10px; margin-top: -32px; border-bottom: 1px solid var(--rule); scrollbar-width: none; }
+  .chips::-webkit-scrollbar { display: none; }
+  .chips a { flex: none; font-family: var(--display); font-size: 14px; color: var(--ink); text-decoration: none; border: 1px solid var(--rule); border-radius: 999px; padding: 4px 12px; background: var(--surface); }
+  .chips a.on { border-color: var(--accent); color: var(--accent); }
+  .net { height: 170px; }
+}
+section { scroll-margin-top: 70px; }
+.shell > *, .hero, .lede { min-width: 0; }
+
+@media (max-width: 900px) {
+  .shell { grid-template-columns: minmax(0, 1fr); gap: 48px; padding-block: 32px 56px; }
+  .id { position: static; }
+  .id nav { display: none; }
+  .id h1 { font-size: 40px; }
+  main { gap: 64px; }
+}
+@media (max-width: 520px) {
+  body { font-size: 16px; }
+  .bar, .axis { grid-template-columns: 96px minmax(0, 1fr) 40px; gap: 8px; }
+  .skills { grid-template-columns: minmax(0, 1fr); gap: 2px; }
+  .skills dd { margin-bottom: 10px; }
+  .edu div { grid-template-columns: minmax(0, 1fr); gap: 2px; }
+  .split { font-size: 11px; }
+  .split > div { padding: 0 8px; }
+}
+</style>
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)} body{margin:0} img{max-width:100%} [hidden]{display:none!important}</style>
+</head>
+<body>
+
+
+<div class="shell">
+  <nav class="chips" aria-label="Sections">
+    <a href="#research">Research</a><a href="#applied">Applied</a><a href="#papers">Papers</a><a href="#earlier">Earlier</a><a href="#skills">Skills</a>
+  </nav>
+  <aside class="id">
+    <div style="display:grid; gap:12px">
+      <h1>Hasti<br>Tajik</h1>
+      <div class="role">Data Scientist<br>M.Sc. Data Science · Tehran</div>
+    </div>
+    <nav aria-label="Sections">
+      <a href="#research">Research <span>01</span></a>
+      <a href="#applied">Applied work <span>02</span></a>
+      <a href="#papers">Paper reimplementations <span>03</span></a>
+      <a href="#earlier">Earlier work <span>04</span></a>
+      <a href="#skills">Skills &amp; education <span>05</span></a>
+    </nav>
+    <div class="links">
+      <div class="row"><span class="k">GitHub</span><span class="v"><a href="https://github.com/hastitajik">hastitajik</a></span></div>
+      <div class="row"><span class="k">LinkedIn</span><span class="v"><a href="https://www.linkedin.com/in/hasti-tajik-b93b1b244">hasti-tajik</a></span></div>
+      <div class="row"><span class="k">Email</span><span class="v"><span id="mail">Hastiitajik@gmail.com</span><button class="copy" id="copy-mail" type="button">copy</button></span></div>
+    </div>
+  </aside>
+
+  <main>
+    <div class="hero">
+      <canvas class="net" id="net" aria-hidden="true"></canvas>
+      <span class="net-cap">knowledge graph · <b>certified path</b> highlighted</span>
+    </div>
+    <div class="lede">
+      <p class="big">I read machine-learning papers and turn them into <em>code you can run and check</em>.</p>
+      <p>I'm an M.Sc. Data Science student at the University of Science and Culture with a B.Sc. in Computer Science from the University of Qom. My work so far: one research project on verifiable LLM retrieval, one computer-vision system for poultry farms, and three journal papers reimplemented from scratch. Each one has a public repository, and each one reports its results as they came out, including the weak ones.</p>
+      <div class="tally">
+        <span><b>5</b>public repositories</span>
+        <span><b>5</b>published papers implemented or extended</span>
+        <span><b>3rd</b>place, GenX competition</span>
+      </div>
+      <div class="index" aria-label="Selected work">
+        <a class="card feature" href="#research"><span class="tag">LLMs · RAG · research</span><b>Evidence certificates for Graph-R1</b><span class="d">Multi-hop QA that only certifies an answer when every fact has an independent source.</span><span class="fig"><em>85%</em> exact match on certified answers vs 18% uncertified</span></a>
+        <a class="card" href="#applied"><span class="tag">Computer vision</span><b>Broiler health early warning</b><span class="d">Four flock-health signals from barn cameras, with automatic alerts.</span><span class="fig">4 signals · 40 tests</span></a>
+        <a class="card" href="#churn"><span class="tag">Deep learning</span><b>FCLCNN-LSTM churn model</b><span class="d">CNN + LSTM hybrid for telecom churn risk.</span><span class="fig">AUC 0.82 · best F1 0.60</span></a>
+        <a class="card" href="#tep"><span class="tag">Time series</span><b>TEP anomaly detection</b><span class="d">Pre-trained Transformer on SMD, MSL and PSM.</span><span class="fig">3 benchmarks · 5 paper studies</span></a>
+        <a class="card" href="#recsys"><span class="tag">Graphs</span><b>Friend recommender</b><span class="d">Link prediction, clustering and a genetic algorithm.</span><span class="fig">10-fold cross-validation</span></a>
+      </div>
+    </div>
+
+    <!-- 01 RESEARCH -->
+    <section id="research">
+      <header>
+        <span class="eyebrow">01 · M.Sc. research, in progress</span>
+        <h2>Evidence certificates for Graph-R1</h2>
+        <p>Can a multi-hop QA system say <em>why</em> it trusts an answer, and be right when it does?</p>
+      </header>
+      <div class="rec">
+        <div class="rec-head">
+          <div class="cite">Extends <i>Graph-R1</i>: knowledge-hypergraph retrieval-augmented generation trained with reinforcement learning</div>
+          <a class="repo" href="https://github.com/hastitajik/Graph-R1-v1">github.com/hastitajik/Graph-R1-v1 ↗</a>
+        </div>
+        <p>Graph-R1 learns to query a knowledge hypergraph and decide when it has seen enough, but its answers come with no evidence, so a lucky guess looks the same as a documented fact. I added a training-free layer on top of it. A frozen LLM breaks each question into facts that must be proven. A value-of-information controller then chooses the next retrieval action (fill a missing fact, follow a chain, find a second source, challenge with counter-evidence, re-verify a source) and stops when no action is worth its cost. An answer gets a certificate only when every fact has a source, the sources are independent, and no contradiction remains.</p>
+        <div class="figure" role="figure" aria-label="67 of 100 answers certified, 85 percent correct; 33 uncertified, 18 percent correct">
+          <div class="cap">2WikiMultiHopQA · 100 held-out test questions · frozen LLM</div>
+          <div class="split">
+            <div class="c"><b>67</b>certified</div>
+            <div class="u"><b>33</b>uncertified</div>
+          </div>
+          <div class="legend">
+            <div><span class="n cert">85%</span><span class="t">exact match among certified answers</span></div>
+            <div><span class="n">18%</span><span class="t">exact match among uncertified answers</span></div>
+          </div>
+        </div>
+        <ul>
+          <li>Overall exact match did not improve on a no-RL Graph-R1 baseline (0.63 vs 0.70, not statistically significant, McNemar p = 0.14). The value of the method is in separating trustworthy answers from the rest, not in raw accuracy.</li>
+          <li>Evaluation: the baseline, the full controller and 11 ablations on the same questions, with 95% confidence intervals and paired McNemar tests. Source verification was the only component whose removal had a visible effect. Learning action success rates cut searches per question by 22% at equal accuracy.</li>
+          <li>125 automated tests. An independent review found cases where a certificate was issued for a wrong answer, and those were fixed.</li>
+        </ul>
+        <p class="note">Next: fix the remaining wrong-but-certified answers (mostly location and date-of-death questions), run on all 128 test questions with the final model, and extend to HotpotQA and MuSiQue.</p>
+        <div class="stack"><span>Python</span><span>LLMs</span><span>RAG</span><span>knowledge hypergraphs</span><span>statistical testing</span></div>
+      </div>
+    </section>
+
+    <!-- 02 APPLIED -->
+    <section id="applied">
+      <header>
+        <span class="eyebrow">02 · Applied computer vision</span>
+        <h2>Broiler health early-warning system</h2>
+        <p>Overhead cameras in a broiler house, read every five minutes, compared with what is normal for this flock at this age and this hour.</p>
+      </header>
+      <div class="rec">
+        <div class="rec-head">
+          <div class="cite">Built on <i>Multi-camera detection and tracking for individual broiler monitoring</i><br>Cardoen et al., Computers and Electronics in Agriculture, 2025 (MVBroTrack)</div>
+          <a class="repo" href="https://github.com/hastitajik/broiler-health-early-warning">github.com/hastitajik/broiler-health-early-warning ↗</a>
+        </div>
+        <div class="rec-body"><div><p>The system processes the 5-minute clips recorded by the farm's DVR and extracts four flock-health signals. Each signal is compared with a baseline (median and MAD) for the same flock age and hour of day, and rule-based alerts fire when a signal stays out of range. A web panel shows farmers and the veterinarian where to look first. It does not replace a veterinary examination.</p></div><svg class="thumb" viewBox="0 0 230 150" role="img" aria-label="Top-down view of a broiler pen with feeder and drinker zones">
+<rect class="ln" x="10" y="10" width="210" height="130" rx="3"/>
+<circle class="bx" cx="70" cy="75" r="26" fill-opacity=".6"/><circle class="bx" cx="160" cy="60" r="20" fill-opacity=".6"/>
+<ellipse class="nd" cx="55.3" cy="79.5" rx="3.2" ry="2.3" transform="rotate(119 55.3 79.5)"/><ellipse class="nd" cx="47.5" cy="82.0" rx="3.2" ry="2.3" transform="rotate(48 47.5 82.0)"/><ellipse class="nd" cx="75.7" cy="88.2" rx="3.2" ry="2.3" transform="rotate(161 75.7 88.2)"/><ellipse class="nd" cx="64.2" cy="69.9" rx="3.2" ry="2.3" transform="rotate(114 64.2 69.9)"/><ellipse class="nd" cx="68.3" cy="79.9" rx="3.2" ry="2.3" transform="rotate(177 68.3 79.9)"/><ellipse class="nd" cx="59.3" cy="62.9" rx="3.2" ry="2.3" transform="rotate(101 59.3 62.9)"/><ellipse class="nd" cx="87.1" cy="71.2" rx="3.2" ry="2.3" transform="rotate(157 87.1 71.2)"/><ellipse class="nd" cx="60.2" cy="61.4" rx="3.2" ry="2.3" transform="rotate(135 60.2 61.4)"/><ellipse class="nd" cx="73.0" cy="76.2" rx="3.2" ry="2.3" transform="rotate(61 73.0 76.2)"/><ellipse class="nd" cx="53.1" cy="62.8" rx="3.2" ry="2.3" transform="rotate(83 53.1 62.8)"/><ellipse class="nd" cx="48.5" cy="83.4" rx="3.2" ry="2.3" transform="rotate(132 48.5 83.4)"/><ellipse class="nd" cx="71.0" cy="85.0" rx="3.2" ry="2.3" transform="rotate(1 71.0 85.0)"/><ellipse class="nd" cx="63.1" cy="63.7" rx="3.2" ry="2.3" transform="rotate(71 63.1 63.7)"/><ellipse class="nd" cx="57.3" cy="83.4" rx="3.2" ry="2.3" transform="rotate(21 57.3 83.4)"/><ellipse class="nd" cx="67.3" cy="64.9" rx="3.2" ry="2.3" transform="rotate(58 67.3 64.9)"/><ellipse class="nd" cx="67.1" cy="74.8" rx="3.2" ry="2.3" transform="rotate(144 67.1 74.8)"/><ellipse class="nd" cx="71.2" cy="62.9" rx="3.2" ry="2.3" transform="rotate(74 71.2 62.9)"/><ellipse class="nd" cx="47.1" cy="94.8" rx="3.2" ry="2.3" transform="rotate(175 47.1 94.8)"/><ellipse class="nd" cx="78.2" cy="75.0" rx="3.2" ry="2.3" transform="rotate(13 78.2 75.0)"/><ellipse class="nd" cx="37.0" cy="81.3" rx="3.2" ry="2.3" transform="rotate(101 37.0 81.3)"/><ellipse class="nd" cx="56.4" cy="82.5" rx="3.2" ry="2.3" transform="rotate(50 56.4 82.5)"/><ellipse class="nd" cx="71.7" cy="65.6" rx="3.2" ry="2.3" transform="rotate(22 71.7 65.6)"/><ellipse class="nd" cx="159.3" cy="61.5" rx="3.2" ry="2.3" transform="rotate(104 159.3 61.5)"/><ellipse class="nd" cx="160.3" cy="55.5" rx="3.2" ry="2.3" transform="rotate(63 160.3 55.5)"/><ellipse class="nd" cx="159.6" cy="58.7" rx="3.2" ry="2.3" transform="rotate(119 159.6 58.7)"/><ellipse class="nd" cx="161.8" cy="54.6" rx="3.2" ry="2.3" transform="rotate(143 161.8 54.6)"/><ellipse class="nd" cx="164.5" cy="69.9" rx="3.2" ry="2.3" transform="rotate(33 164.5 69.9)"/><ellipse class="nd" cx="151.4" cy="64.3" rx="3.2" ry="2.3" transform="rotate(101 151.4 64.3)"/><ellipse class="nd" cx="153.9" cy="63.0" rx="3.2" ry="2.3" transform="rotate(69 153.9 63.0)"/><ellipse class="nd" cx="177.9" cy="41.6" rx="3.2" ry="2.3" transform="rotate(151 177.9 41.6)"/><ellipse class="nd" cx="153.1" cy="77.6" rx="3.2" ry="2.3" transform="rotate(53 153.1 77.6)"/><ellipse class="nd" cx="172.7" cy="87.5" rx="3.2" ry="2.3" transform="rotate(154 172.7 87.5)"/><ellipse class="nd" cx="157.1" cy="56.8" rx="3.2" ry="2.3" transform="rotate(37 157.1 56.8)"/><ellipse class="nd" cx="161.8" cy="66.8" rx="3.2" ry="2.3" transform="rotate(156 161.8 66.8)"/><ellipse class="nd" cx="81.8" cy="51.8" rx="3.2" ry="2.3" transform="rotate(18 81.8 51.8)"/><ellipse class="nd" cx="32.4" cy="41.8" rx="3.2" ry="2.3" transform="rotate(162 32.4 41.8)"/><ellipse class="nd" cx="65.1" cy="86.5" rx="3.2" ry="2.3" transform="rotate(95 65.1 86.5)"/><ellipse class="nd" cx="138.7" cy="32.5" rx="3.2" ry="2.3" transform="rotate(150 138.7 32.5)"/><ellipse class="nd" cx="111.8" cy="83.5" rx="3.2" ry="2.3" transform="rotate(98 111.8 83.5)"/><ellipse class="nd" cx="53.5" cy="35.6" rx="3.2" ry="2.3" transform="rotate(58 53.5 35.6)"/><ellipse class="nd" cx="176.7" cy="46.4" rx="3.2" ry="2.3" transform="rotate(48 176.7 46.4)"/><ellipse class="nd" cx="48.7" cy="89.7" rx="3.2" ry="2.3" transform="rotate(141 48.7 89.7)"/><ellipse class="nd" cx="56.1" cy="126.3" rx="3.2" ry="2.3" transform="rotate(123 56.1 126.3)"/><ellipse class="nd" cx="135.1" cy="66.0" rx="3.2" ry="2.3" transform="rotate(26 135.1 66.0)"/><ellipse class="nd" cx="39.2" cy="76.4" rx="3.2" ry="2.3" transform="rotate(65 39.2 76.4)"/><ellipse class="nd" cx="64.3" cy="98.3" rx="3.2" ry="2.3" transform="rotate(65 64.3 98.3)"/><ellipse class="nd" cx="99.6" cy="121.1" rx="3.2" ry="2.3" transform="rotate(125 99.6 121.1)"/><ellipse class="nd" cx="74.9" cy="38.0" rx="3.2" ry="2.3" transform="rotate(17 74.9 38.0)"/><ellipse class="nd" cx="42.5" cy="72.6" rx="3.2" ry="2.3" transform="rotate(167 42.5 72.6)"/><ellipse class="nd" cx="183.4" cy="88.0" rx="3.2" ry="2.3" transform="rotate(71 183.4 88.0)"/><ellipse class="nd" cx="59.2" cy="122.3" rx="3.2" ry="2.3" transform="rotate(4 59.2 122.3)"/><ellipse class="nd" cx="31.4" cy="64.9" rx="3.2" ry="2.3" transform="rotate(63 31.4 64.9)"/><ellipse class="nd" cx="29.7" cy="38.1" rx="3.2" ry="2.3" transform="rotate(94 29.7 38.1)"/><ellipse class="nd" cx="121.0" cy="128.9" rx="3.2" ry="2.3" transform="rotate(23 121.0 128.9)"/><ellipse class="nd" cx="88.3" cy="119.6" rx="3.2" ry="2.3" transform="rotate(84 88.3 119.6)"/><ellipse class="nd" cx="145.4" cy="96.8" rx="3.2" ry="2.3" transform="rotate(149 145.4 96.8)"/><ellipse class="nd" cx="201.7" cy="85.2" rx="3.2" ry="2.3" transform="rotate(4 201.7 85.2)"/><ellipse class="nd" cx="110.1" cy="58.8" rx="3.2" ry="2.3" transform="rotate(79 110.1 58.8)"/><ellipse class="nd" cx="204.8" cy="20.4" rx="3.2" ry="2.3" transform="rotate(162 204.8 20.4)"/><ellipse class="nd" cx="32.5" cy="25.7" rx="3.2" ry="2.3" transform="rotate(79 32.5 25.7)"/><ellipse class="nd" cx="79.9" cy="131.9" rx="3.2" ry="2.3" transform="rotate(19 79.9 131.9)"/><ellipse class="nd" cx="105.9" cy="59.9" rx="3.2" ry="2.3" transform="rotate(11 105.9 59.9)"/><ellipse class="nd" cx="192.6" cy="102.0" rx="3.2" ry="2.3" transform="rotate(180 192.6 102.0)"/><ellipse class="nd" cx="43.1" cy="127.8" rx="3.2" ry="2.3" transform="rotate(87 43.1 127.8)"/><ellipse class="nd" cx="86.3" cy="96.1" rx="3.2" ry="2.3" transform="rotate(19 86.3 96.1)"/><ellipse class="nd" cx="187.0" cy="65.6" rx="3.2" ry="2.3" transform="rotate(7 187.0 65.6)"/><ellipse class="nd" cx="185.5" cy="83.3" rx="3.2" ry="2.3" transform="rotate(159 185.5 83.3)"/><ellipse class="nd" cx="146.5" cy="61.2" rx="3.2" ry="2.3" transform="rotate(3 146.5 61.2)"/><ellipse class="nd" cx="136.1" cy="27.1" rx="3.2" ry="2.3" transform="rotate(163 136.1 27.1)"/><ellipse class="nd" cx="40.4" cy="47.3" rx="3.2" ry="2.3" transform="rotate(106 40.4 47.3)"/><circle class="ctl" cx="190" cy="120" r="8"/><circle class="ct" cx="190" cy="120" r="3"/>
+<text x="52" y="113">feeder</text><text x="142" y="92">drinker</text></svg></div>
+        <div class="signals">
+          <div><b>Activity</b><span>Share of birds moving, from optical flow or per-bird tracks</span><code>inactive_frac</code></div>
+          <div><b>Distribution</b><span>Birds at feeders and drinkers versus walls and corners</span><code>feeder_time_frac</code></div>
+          <div><b>Mortality</b><span>A bird-sized object that stays still for hours while the flock is active</span><code>bird_count</code></div>
+          <div><b>Daily rhythm</b><span>Last 24 h against the usual hourly profile, lights-off hours excluded</span><code>rhythm_corr</code></div>
+        </div>
+        <ul>
+          <li>Two detection modes: colour segmentation that needs no training, and a YOLO detector fine-tuned on the farm's own frames with floor-plane tracking (Hungarian matching, in metres).</li>
+          <li>Camera calibration by homography onto a floor map with feeder, drinker, wall and corner zones; dated versions for when a camera moves.</li>
+          <li>Validation against the vet log: recall, precision, false alerts per week and warning time.</li>
+          <li>FastAPI panel, SQLite storage, webhook notifications, and 40 pytest tests on synthetic video.</li>
+        </ul>
+        <p class="note">Alert thresholds still need tuning with the farm veterinarian on real flock data, so there are no field accuracy numbers yet.</p>
+        <div class="stack"><span>OpenCV</span><span>YOLO</span><span>PyTorch</span><span>FastAPI</span><span>SQLite</span><span>pytest</span></div>
+      </div>
+    </section>
+
+    <!-- 03 PAPERS -->
+    <section id="papers">
+      <header>
+        <span class="eyebrow">03 · Paper reimplementations</span>
+        <h2>Three papers, rebuilt from the text</h2>
+        <p>Each one implements the method as published, reproduces the paper's experiments where data allows, and lists the places where the paper leaves a detail unspecified.</p>
+      </header>
+
+      <div class="rec" id="churn">
+        <div class="rec-head">
+          <h3>FCLCNN-LSTM for telecom churn risk</h3>
+          <a class="repo" href="https://github.com/hastitajik/fclcnn-lstm-churn">fclcnn-lstm-churn ↗</a>
+        </div>
+        <div class="rec-body"><div><div class="cite"><i>Risk assessment of customer churn in telco using FCLCNN-LSTM model</i><br>Wang et al., Expert Systems with Applications, 2024</div>
+        <p>A fully connected layer homogenises customer features, a 2D CNN extracts spatial patterns from the reshaped vector, and an LSTM extracts sequential ones. Built in TensorFlow on the IBM Telco dataset (7,043 customers, 26.5% churn) with Maj-LASSO feature selection for imbalanced data (30 → 22 features) and hyperparameters searched with the Whale Optimization Algorithm.</p></div><svg class="thumb" viewBox="0 0 230 150" role="img" aria-label="Model diagram: fully connected layer, CNN, LSTM, output">
+<rect class="bx" x="10" y="40" width="34" height="70" rx="4"/><text x="13" y="128">FCL</text>
+<g><rect class="bx" x="62" y="48" width="9" height="9" rx="1"/><rect class="bx" x="73" y="48" width="9" height="9" rx="1"/><rect class="bx" x="84" y="48" width="9" height="9" rx="1"/><rect class="bx" x="95" y="48" width="9" height="9" rx="1"/><rect class="bx" x="62" y="59" width="9" height="9" rx="1"/><rect class="bx" x="73" y="59" width="9" height="9" rx="1"/><rect class="bx" x="84" y="59" width="9" height="9" rx="1"/><rect class="bx" x="95" y="59" width="9" height="9" rx="1"/><rect class="bx" x="62" y="70" width="9" height="9" rx="1"/><rect class="bx" x="73" y="70" width="9" height="9" rx="1"/><rect class="bx" x="84" y="70" width="9" height="9" rx="1"/><rect class="bx" x="95" y="70" width="9" height="9" rx="1"/><rect class="bx" x="62" y="81" width="9" height="9" rx="1"/><rect class="bx" x="73" y="81" width="9" height="9" rx="1"/><rect class="bx" x="84" y="81" width="9" height="9" rx="1"/><rect class="bx" x="95" y="81" width="9" height="9" rx="1"/><rect class="bx" x="62" y="92" width="9" height="9" rx="1"/><rect class="bx" x="73" y="92" width="9" height="9" rx="1"/><rect class="bx" x="84" y="92" width="9" height="9" rx="1"/><rect class="bx" x="95" y="92" width="9" height="9" rx="1"/></g><text x="68" y="128">CNN</text>
+<path class="ac" d="M118 75 h18"/><rect class="bx" x="140" y="62" width="11" height="26" rx="2"/><rect class="bx" x="154" y="62" width="11" height="26" rx="2"/><rect class="bx" x="168" y="62" width="11" height="26" rx="2"/><path class="ac" d="M150 75 h5 M164 75 h5"/><text x="146" y="128">LSTM</text>
+<path class="ac" d="M44 75 h16 M184 75 h14"/><circle class="ct" cx="208" cy="75" r="9"/><text x="194" y="128">risk</text>
+</svg></div>
+        <div class="figure" role="figure" aria-label="F1 score by model on the test set">
+          <div class="cap">F1 on the held-out test set · axis from 0 to 0.7</div>
+          <div class="bars">
+            <div class="bar me"><span>FCLCNN-LSTM</span><span class="track"><span class="fill" style="width:86.3%"></span></span><span class="val">0.604</span></div>
+            <div class="bar"><span>Logistic Reg.</span><span class="track"><span class="fill" style="width:86.1%"></span></span><span class="val">0.603</span></div>
+            <div class="bar"><span>XGBoost</span><span class="track"><span class="fill" style="width:82.6%"></span></span><span class="val">0.578</span></div>
+            <div class="bar"><span>SVM</span><span class="track"><span class="fill" style="width:79.7%"></span></span><span class="val">0.558</span></div>
+            <div class="bar"><span>Random Forest</span><span class="track"><span class="fill" style="width:73.4%"></span></span><span class="val">0.514</span></div>
+          </div>
+          <div class="axis"><span></span><span class="ticks"><span>0</span><span>0.35</span><span>0.7</span></span><span></span></div>
+        </div>
+        <p>The model has the highest recall (0.61) and an AUC of 0.82, so it catches more of the customers who actually leave. Logistic regression is almost as good on F1 for this small tabular dataset, and the write-up says so.</p>
+        <div class="stack"><span>TensorFlow/Keras</span><span>scikit-learn</span><span>imbalanced-learn</span><span>XGBoost</span></div>
+      </div>
+
+      <div class="rec" id="tep">
+        <div class="rec-head">
+          <h3>TEP: Transformer anomaly detection for multivariate time series</h3>
+          <a class="repo" href="https://github.com/hastitajik/tep-anomaly-detection">tep-anomaly-detection ↗</a>
+        </div>
+        <div class="rec-body"><div><div class="cite"><i>Pre-training Enhanced Transformer for multivariate time series anomaly detection</i><br>Wang et al., Information Fusion, 2025</div>
+        <p>A two-stage unsupervised framework in PyTorch: a CANets encoder (temporal convolution plus multi-head attention) is pre-trained and frozen, a reconstruction Transformer is trained on its features, and an anomaly-feature-knowledge score is thresholded automatically with Peaks-Over-Threshold. Normalisation, windows and thresholds are computed per entity so data never leaks between machines.</p></div><svg class="thumb" viewBox="0 0 230 150" role="img" aria-label="Time series with anomalies above a POT threshold">
+<path class="ln" d="M10 130 H220"/><path class="ctl" stroke-dasharray="4 4" d="M10 52 H220"/><text x="168" y="46">POT</text>
+<path class="ac" d="M10.0 77.4 L13.5 84.4 L17.0 86.4 L20.5 92.2 L24.0 95.2 L27.5 91.8 L31.0 92.6 L34.5 101.4 L38.0 95.2 L41.5 93.7 L45.0 99.3 L48.5 91.3 L52.0 91.6 L55.5 84.3 L59.0 81.9 L62.5 73.1 L66.0 74.1 L69.5 73.0 L73.0 66.6 L76.5 66.5 L80.0 64.4 L83.5 57.7 L87.0 22.9 L90.5 22.3 L94.0 63.4 L97.5 63.3 L101.0 74.9 L104.5 74.7 L108.0 81.1 L111.5 86.7 L115.0 88.9 L118.5 94.5 L122.0 92.2 L125.5 98.6 L129.0 96.7 L132.5 102.3 L136.0 101.6 L139.5 92.8 L143.0 91.3 L146.5 89.5 L150.0 93.8 L153.5 84.9 L157.0 82.9 L160.5 75.7 L164.0 31.8 L167.5 69.1 L171.0 65.6 L174.5 65.5 L178.0 63.8 L181.5 66.1 L185.0 63.9 L188.5 67.3 L192.0 68.3 L195.5 72.1 L199.0 72.1 L202.5 70.6 L206.0 81.4 L209.5 86.4 L213.0 89.8 L216.5 90.0"/><circle class="ct" cx="87.0" cy="22.9" r="4"/><circle class="ct" cx="90.5" cy="22.3" r="4"/><circle class="ct" cx="164.0" cy="31.8" r="4"/><text x="10" y="145">anomaly score over time</text></svg></div>
+        <ul>
+          <li>Runs on the SMD, MSL and PSM benchmarks and reproduces the paper's ablation, kernel visualisation, parameter-sensitivity, noise-robustness and knowledge-transfer studies.</li>
+          <li>All hyperparameters in one config object; every ambiguity in the paper marked <code>PAPER GAP</code> in the code; smoke tests for each module.</li>
+        </ul>
+        <p class="note">The published outputs come from a two-epoch check run. AUC is about 0.84 on SMD and 0.86 on PSM, but F1 is still low at that budget, so these numbers are not comparable to the paper's.</p>
+        <div class="stack"><span>PyTorch</span><span>SciPy</span><span>NumPy</span><span>pandas</span></div>
+      </div>
+
+      <div class="rec" id="recsys">
+        <div class="rec-head">
+          <h3>Friend recommendation with link prediction, clustering and a genetic algorithm</h3>
+          <a class="repo" href="https://github.com/hastitajik/social-network-recommender">social-network-recommender ↗</a>
+        </div>
+        <div class="rec-body"><div><div class="cite"><i>A recommender system for social networks using link prediction, clustering and genetic algorithm</i><br>Lu et al., Egyptian Informatics Journal, 2025</div>
+        <p>Edge weights mix cosine similarity of user profiles and of connection vectors. Communities come from a minimum spanning tree whose heaviest edges are cut, then merged greedily while modularity rises. Inside each community, loop-free paths of length 2 to L score candidate friends, and a genetic algorithm tunes the number of clusters and the path length.</p></div><svg class="thumb" viewBox="0 0 230 150" role="img" aria-label="Three user communities with a predicted friendship link">
+<path class="ln" d="M71.0 53.3 L45.1 71.3"/><path class="ln" d="M71.0 53.3 L34.6 60.5"/><path class="ln" d="M61.3 68.6 L45.1 71.3"/><path class="ln" d="M61.3 68.6 L59.0 40.3"/><path class="ln" d="M34.6 60.5 L59.0 40.3"/><path class="ln" d="M190.5 48.8 L176.7 62.5"/><path class="ln" d="M190.5 48.8 L149.6 72.5"/><path class="ln" d="M190.5 48.8 L161.5 35.8"/><path class="ln" d="M176.7 62.5 L149.6 72.5"/><path class="ln" d="M149.6 72.5 L161.5 35.8"/><path class="ln" d="M125.3 111.7 L114.3 98.7"/><path class="ln" d="M102.8 135.9 L90.9 113.4"/><path class="ln" d="M102.8 135.9 L102.9 101.9"/><path class="ln" d="M90.9 113.4 L102.9 101.9"/><path class="ln" d="M102.9 101.9 L114.3 98.7"/><path class="ln" d="M45.1 71.3 L145.5 49.1"/><path class="ln" d="M161.5 35.8 L90.9 113.4"/><circle class="nd" cx="71.0" cy="53.3" r="4"/><circle class="nd" cx="61.3" cy="68.6" r="4"/><circle class="nd" cx="45.1" cy="71.3" r="4"/><circle class="nd" cx="34.6" cy="60.5" r="4"/><circle class="nd" cx="40.6" cy="41.0" r="4"/><circle class="nd" cx="59.0" cy="40.3" r="4"/><circle class="nd" cx="190.5" cy="48.8" r="4"/><circle class="nd" cx="176.7" cy="62.5" r="4"/><circle class="nd" cx="149.6" cy="72.5" r="4"/><circle class="nd" cx="145.5" cy="49.1" r="4"/><circle class="nd" cx="161.5" cy="35.8" r="4"/><circle class="nd" cx="177.2" cy="36.7" r="4"/><circle class="nd" cx="125.3" cy="111.7" r="4"/><circle class="nd" cx="125.2" cy="135.4" r="4"/><circle class="nd" cx="102.8" cy="135.9" r="4"/><circle class="nd" cx="90.9" cy="113.4" r="4"/><circle class="nd" cx="102.9" cy="101.9" r="4"/><circle class="nd" cx="114.3" cy="98.7" r="4"/><path class="ctl" stroke-dasharray="4 3" d="M71.0 53.3 L34.6 60.5"/><circle class="ct" cx="71.0" cy="53.3" r="4.5"/><circle class="ct" cx="34.6" cy="60.5" r="4.5"/></svg></div>
+        <ul>
+          <li>Single-file Python and NetworkX, 10-fold cross-validation over edges.</li>
+          <li>Tested on a synthetic 400-user network with built-in community structure (the paper's Pokec data is not bundled): recall@10 of 0.17, with precision limited because each test user has only one or two held-out links.</li>
+        </ul>
+        <div class="stack"><span>Python</span><span>NetworkX</span><span>NumPy</span><span>pandas</span></div>
+      </div>
+    </section>
+
+    <!-- 04 EARLIER -->
+    <section id="earlier">
+      <header>
+        <span class="eyebrow">04 · Earlier work</span>
+        <h2>Competition and thesis</h2>
+      </header>
+      <div class="pair">
+        <div class="rec">
+          <h3>GenX image search engine</h3>
+          <div class="cite">3rd place · team of three · product manager</div>
+          <p>Owned the roadmap and user requirements. Scraped listings from Divar, trained a BLIP-2 vision-language model and evaluated retrieval with a Qdrant vector database. The prototype processed more than 1,000 images at 92% accuracy.</p>
+        </div>
+        <div class="rec">
+          <h3>Persian text spell checker</h3>
+          <div class="cite">B.Sc. thesis · University of Qom</div>
+          <p>An LSTM-based model for Farsi. Collected and preprocessed the datasets, implemented error detection, reviewed the literature and wrote a 40-page report.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 05 SKILLS -->
+    <section id="skills">
+      <header>
+        <span class="eyebrow">05 · Skills &amp; education</span>
+        <h2>Toolkit</h2>
+      </header>
+      <dl class="skills">
+        <dt>Languages</dt><dd>Python, SQL, Git</dd>
+        <dt>Deep learning</dt><dd>PyTorch, TensorFlow/Keras · CNN, LSTM, Transformers, attention</dd>
+        <dt>Machine learning</dt><dd>scikit-learn, XGBoost, imbalanced-learn, genetic and whale optimisation</dd>
+        <dt>Areas</dt><dd>LLMs and RAG, time-series anomaly detection, object detection and tracking, recommender systems and graph mining, NLP</dd>
+        <dt>Data &amp; engineering</dt><dd>pandas, NumPy, Matplotlib, Seaborn, NetworkX, OpenCV, FastAPI, SQLite, pytest, web scraping</dd>
+        <dt>Working</dt><dd>Product management, teamwork, reading and reproducing papers · Persian (native), English (fluent)</dd>
+      </dl>
+      <div class="edu" style="margin-top:40px">
+        <div><span class="yr">2025 – 2027</span><span><b>M.Sc. Computer Engineering, Data Science</b><br>University of Science and Culture, Tehran (expected 2027)</span></div>
+        <div><span class="yr">2018 – 2022</span><span><b>B.Sc. Computer Science</b><br>University of Qom</span></div>
+      </div>
+    </section>
+
+    <footer>Hasti Tajik · Tehran, Iran · every project above links to its code on GitHub</footer>
+  </main>
+</div>
+
+<script>
+(function () {
+  var btn = document.getElementById('copy-mail');
+  var mail = document.getElementById('mail');
+  btn.addEventListener('click', function () {
+    var text = mail.textContent;
+    function selectIt() {
+      var r = document.createRange(); r.selectNodeContents(mail);
+      var s = window.getSelection(); s.removeAllRanges(); s.addRange(r);
+      btn.textContent = 'selected';
+    }
+    try {
+      navigator.clipboard.writeText(text).then(function () { btn.textContent = 'copied'; }, selectIt);
+    } catch (e) { selectIt(); }
+    setTimeout(function () { btn.textContent = 'copy'; }, 1800);
+  });
+
+  /* active section in nav */
+  var links = Array.prototype.slice.call(document.querySelectorAll('.id nav a, .chips a'));
+  if ('IntersectionObserver' in window) {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) {
+        if (!en.isIntersecting) return;
+        links.forEach(function (a) { a.classList.toggle('on', a.getAttribute('href') === '#' + en.target.id); });
+      });
+    }, { rootMargin: '-35% 0px -60% 0px' });
+    document.querySelectorAll('main > section').forEach(function (s) { io.observe(s); });
+  }
+
+  /* hero: drifting knowledge graph with one certified path */
+  var cv = document.getElementById('net'), ctx = cv.getContext('2d');
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var W, H, nodes = [], colors = {};
+  function readColors() {
+    var cs = getComputedStyle(document.documentElement);
+    ['--rule', '--muted', '--accent', '--cert'].forEach(function (k) { colors[k] = cs.getPropertyValue(k).trim(); });
+  }
+  function size() {
+    var r = cv.getBoundingClientRect(), dpr = window.devicePixelRatio || 1;
+    W = r.width; H = r.height; cv.width = W * dpr; cv.height = H * dpr; ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+  function seed() {
+    var n = Math.max(34, Math.round(W / 18)), rnd = mulberry(42);
+    nodes = [];
+    for (var i = 0; i < n; i++) nodes.push({ x: rnd() * W, y: 20 + rnd() * (H - 40), vx: (rnd() - .5) * .18, vy: (rnd() - .5) * .18, r: 2 + rnd() * 2.2 });
+  }
+  function mulberry(a) { return function () { a |= 0; a = a + 0x6D2B79F5 | 0; var t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+  function path() {
+    /* left-most node to right-most node via nearest neighbours moving right */
+    var start = nodes.reduce(function (a, b) { return a.x < b.x ? a : b; }), p = [start], cur = start;
+    for (var k = 0; k < 8; k++) {
+      var best = null, bd = 1e9;
+      nodes.forEach(function (m) { if (m.x > cur.x + 20) { var d = Math.hypot(m.x - cur.x, (m.y - cur.y) * 1.4); if (d < bd) { bd = d; best = m; } } });
+      if (!best) break; p.push(best); cur = best;
+    }
+    return p;
+  }
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+    var maxD = Math.min(120, W / 6);
+    ctx.lineWidth = 1;
+    for (var i = 0; i < nodes.length; i++) for (var j = i + 1; j < nodes.length; j++) {
+      var a = nodes[i], b = nodes[j], d = Math.hypot(a.x - b.x, a.y - b.y);
+      if (d < maxD) { ctx.globalAlpha = (1 - d / maxD) * .45; ctx.strokeStyle = colors['--muted']; ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke(); }
+    }
+    ctx.globalAlpha = 1;
+    var p = path();
+    ctx.strokeStyle = colors['--cert']; ctx.lineWidth = 2; ctx.beginPath();
+    p.forEach(function (n, k) { k ? ctx.lineTo(n.x, n.y) : ctx.moveTo(n.x, n.y); }); ctx.stroke();
+    nodes.forEach(function (n) {
+      var on = p.indexOf(n) > -1;
+      ctx.fillStyle = on ? colors['--cert'] : colors['--accent'];
+      ctx.globalAlpha = on ? 1 : .55;
+      ctx.beginPath(); ctx.arc(n.x, n.y, on ? n.r + 1.5 : n.r, 0, Math.PI * 2); ctx.fill();
+    });
+    ctx.globalAlpha = 1;
+  }
+  function step() {
+    nodes.forEach(function (n) {
+      n.x += n.vx; n.y += n.vy;
+      if (n.x < 6 || n.x > W - 6) n.vx *= -1;
+      if (n.y < 14 || n.y > H - 8) n.vy *= -1;
+    });
+    draw();
+    if (!document.hidden) requestAnimationFrame(step); else waiting = true;
+  }
+  var waiting = false;
+  document.addEventListener('visibilitychange', function () { if (!document.hidden && waiting && !reduce) { waiting = false; requestAnimationFrame(step); } });
+  readColors(); size(); seed();
+  if (reduce) draw(); else requestAnimationFrame(step);
+  window.addEventListener('resize', function () { size(); seed(); draw(); });
+  if (window.matchMedia) window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function () { readColors(); draw(); });
+  new MutationObserver(function () { readColors(); draw(); }).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+})();
+</script>
+
+</body>
+</html>
